@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 
+// Login restaurant
 export async function loginRestaurant(email, password) {
   const restaurant = await Restaurant.findOne({ email });
   if (!restaurant) {
@@ -40,12 +41,21 @@ export async function loginRestaurant(email, password) {
   };
 }
 
+// Register restaurant
 export async function registerRestaurant({ restaurantName, ownerName, email, password }) {
+  // Validate Latin-only restaurantName
+  const latinPattern = /^[a-zA-Z0-9-]+$/;
+  if (!latinPattern.test(restaurantName)) {
+    throw new Error('Името на ресторанта трябва да съдържа само латински букви, цифри или тирета, без интервали.');
+  }
+
+  // Check for existing email
   const existing = await Restaurant.findOne({ email });
   if (existing) {
     throw new Error('Ресторант с този email вече съществува!');
   }
 
+  // Strong password validation
   const isStrong = validator.isStrongPassword(password, {
     minLength: 8,
     minLowercase: 1,
@@ -60,6 +70,7 @@ export async function registerRestaurant({ restaurantName, ownerName, email, pas
     );
   }
 
+  // Create restaurant
   const restaurant = new Restaurant({
     restaurantName,
     ownerName,

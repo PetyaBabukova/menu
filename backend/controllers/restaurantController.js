@@ -1,6 +1,6 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import { loginRestaurant, registerRestaurant } from '../services/userService.js';
+import { loginRestaurant, registerRestaurant } from '../services/restaurantService.js';
 
 const router = express.Router();
 const SECRET = process.env.JWT_SECRET || 'secret';
