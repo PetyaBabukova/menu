@@ -1,9 +1,9 @@
 import express from 'express';
-import userController from './controllers/restaurantController.js';
+import restaurantController from './controllers/restaurantController.js';
 
 const router = express.Router();
 
-router.use('/users', userController); // всички /users/* маршрути
+router.use('/restaurants', restaurantController); // всички /users/* маршрути
 
 router.get('/ping', (req, res) => {
   res.json({ message: '🍽️ Меню сървърът работи' });

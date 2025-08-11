@@ -6,18 +6,19 @@ import jwt from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 
 // Login restaurant
-export async function loginRestaurant(email, password) {
-  const restaurant = await Restaurant.findOne({ email });
+export async function loginRestaurant(email, password, restaurantNameFromUrl) {
+  // Търсим по име + email, за да избегнем несъответствия
+  const restaurant = await Restaurant.findOne({
+    restaurantName: restaurantNameFromUrl,
+    email: email.toLowerCase().trim(),
+  });
+
   if (!restaurant) {
-    console.log('❌ Няма такъв ресторант!');
     throw new Error('Invalid credentials');
   }
 
   const isValid = await bcrypt.compare(password, restaurant.password);
-  console.log('✅ bcrypt.compare резултат:', isValid);
-
   if (!isValid) {
-    console.log('❌ Паролата е невалидна!');
     throw new Error('Invalid credentials');
   }
 
@@ -25,7 +26,7 @@ export async function loginRestaurant(email, password) {
     {
       _id: restaurant._id,
       restaurantName: restaurant.restaurantName,
-      email: restaurant.email
+      email: restaurant.email,
     },
     JWT_SECRET,
     { expiresIn: '1d' }
@@ -50,7 +51,7 @@ export async function registerRestaurant({ restaurantName, ownerName, email, pas
   }
 
   // Check for existing email
-  const existing = await Restaurant.findOne({ email });
+  const existing = await Restaurant.findOne({ email: email.toLowerCase().trim() });
   if (existing) {
     throw new Error('Ресторант с този email вече съществува!');
   }
@@ -70,11 +71,11 @@ export async function registerRestaurant({ restaurantName, ownerName, email, pas
     );
   }
 
-  // Create restaurant
+  // Create restaurant (паролата ще се хешира в pre-save hook)
   const restaurant = new Restaurant({
     restaurantName,
     ownerName,
-    email,
+    email: email.toLowerCase().trim(),
     password
   });
 
@@ -85,4 +86,10 @@ export async function registerRestaurant({ restaurantName, ownerName, email, pas
     restaurantName: restaurant.restaurantName,
     email: restaurant.email
   };
+}
+
+// Нова функция за извличане на ресторант по име
+export async function getRestaurantByName(restaurantName) {
+  const normalizedName = restaurantName.toLowerCase().trim();
+  return await Restaurant.findOne({ restaurantName: normalizedName });
 }

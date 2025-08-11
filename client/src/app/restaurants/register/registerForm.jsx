@@ -1,6 +1,9 @@
 'use client';
 import { useState } from 'react';
 
+// базовият адрес се чете от .env.local; ако липсва, използваме localhost:5000
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
     restaurantName: '',
@@ -9,7 +12,6 @@ export default function RegisterForm() {
     password: '',
     confirmPassword: '',
   });
-
   const [message, setMessage] = useState(null);
 
   const handleChange = (e) => {
@@ -20,19 +22,19 @@ export default function RegisterForm() {
     e.preventDefault();
     setMessage(null);
 
-    // Check if passwords match
+    // проверка за съвпадение на паролите
     if (formData.password !== formData.confirmPassword) {
       return setMessage('❌ Паролите не съвпадат.');
     }
 
-    // Client-side check for Latin restaurant name
+    // проверка за валидно URL име на ресторанта (латиница, цифри, тирета)
     const latinPattern = /^[a-zA-Z0-9-]+$/;
     if (!latinPattern.test(formData.restaurantName)) {
       return setMessage('❌ Името на ресторанта трябва да съдържа само латински букви, цифри или тирета, без интервали.');
     }
 
     try {
-      const res = await fetch('http://localhost:5000/users/register', {
+      const res = await fetch(`${API_BASE_URL}/restaurants/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
@@ -68,7 +70,6 @@ export default function RegisterForm() {
         Това ще се използва в URL: <code>/restaurant-name/login</code><br />
         Използвай само латински букви, цифри и тирета (пример: <strong>mamma-mia</strong>)
       </p>
-
       <input
         name="ownerName"
         placeholder="Име на собственика"
@@ -77,7 +78,6 @@ export default function RegisterForm() {
         required
         className="w-full p-2 border"
       />
-
       <input
         type="email"
         name="email"
@@ -87,7 +87,6 @@ export default function RegisterForm() {
         required
         className="w-full p-2 border"
       />
-
       <input
         type="password"
         name="password"
@@ -97,7 +96,6 @@ export default function RegisterForm() {
         required
         className="w-full p-2 border"
       />
-
       <input
         type="password"
         name="confirmPassword"
@@ -107,17 +105,14 @@ export default function RegisterForm() {
         required
         className="w-full p-2 border"
       />
-
-      <button
-        type="submit"
-        className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-      >
+      <button type="submit" className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">
         Регистрирай ресторант
       </button>
-
-      {message && <p className={`mt-2 ${message.startsWith('✅') ? 'text-green-600' : 'text-red-600'}`}>
-        {message}
-      </p>}
+      {message && (
+        <p className={`mt-2 ${message.startsWith('✅') ? 'text-green-600' : 'text-red-600'}`}>
+          {message}
+        </p>
+      )}
     </form>
   );
 }
