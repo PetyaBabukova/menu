@@ -15,6 +15,11 @@ router.post('/register', async (req, res) => {
   }
 });
 
+// Проверка дали ресторант съществува
+router.get('/:restaurantName/check', restaurantRegistered, (req, res) => {
+  res.status(200).json({ message: 'OK' });
+});
+
 // Логин на ресторант
 router.post('/:restaurantName/login', restaurantRegistered, async (req, res) => {
   const { email, password } = req.body;

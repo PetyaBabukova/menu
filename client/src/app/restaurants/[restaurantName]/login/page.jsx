@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
@@ -9,6 +9,22 @@ export default function LoginPage() {
   const router = useRouter();
   const [formData, setFormData] = useState({ email: '', password: '' });
   const [message, setMessage] = useState(null);
+
+  // ✱ Проверка за съществуване на ресторант
+  useEffect(() => {
+    const checkRestaurant = async () => {
+      try {
+        const res = await fetch(`${API_URL}/restaurants/${restaurantName}/check`);
+        if (res.status === 404) {
+          router.replace('/404');
+        }
+      } catch (err) {
+        // при мрежова грешка също показваме 404
+        router.replace('/404');
+      }
+    };
+    checkRestaurant();
+  }, [restaurantName, router]);
 
   const handleChange = (e) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -22,14 +38,13 @@ export default function LoginPage() {
       const res = await fetch(`${API_URL}/restaurants/${restaurantName}/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // за HttpOnly cookie
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || 'Възникна грешка.');
 
-      // ✅ успешен вход → пренасочване към началната страница
       router.push('/');
     } catch (err) {
       setMessage(`❌ ${err.message}`);
