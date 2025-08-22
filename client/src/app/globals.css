@@ -1,26 +1,255 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css');
 
+/*
+  Глобални стилове за Menu проекта.
+
+  Цветовата схема е подбрана така, че да създава уютна, но модерна визия за ресторантско меню.
+  - primary: тъмен синьо‑сив нюанс за хедъра и основни елементи
+  - accent: топъл оранжев за акценти и интерактивни елементи
+  - secondary: меко зелено за второстепенни елементи
+  - text-dark / text-light: цветове за текст върху светъл и тъмен фон
+  - background: светъл сивкаво‑бял фон за съдържанието
+*/
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Цветова палитра "Watermelon Sorbet" */
+  /* Основни цветове */
+  --primary: #073b4c;         /* тъмно синьо – основен фон за хедъра */
+  --primary-light: #118ab2;   /* по-светло синьо за вторични елементи */
+  --secondary: #06d6a0;       /* свежо зелено за второстепенни акценти */
+  --secondary-light: #9bf1d5; /* по-светло зелено за фонове */
+  /* Коригиран акцент според изискването: заменяме розовия цвят с по-топъл оранжево-розов нюанс */
+  --accent: #ef9547;          /* топъл оранжево-розов оттенък за акценти и интерактивни елементи */
+  --accent-light: #f7caa3;    /* по-светъл вариант на акцента за hover ефекти */
+
+  /* Цветове за текст и фон */
+  --text-dark: #073b4c;       /* използваме същото тъмно синьо за текст на светъл фон */
+  --text-light: #ffffff;      /* бял текст върху тъмни фонове */
+  --background: #f5f5f5;      /* много светъл сиво-бял фон за страниците */
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* Reset базови стилове */
+* {
+  margin: 0;
+  padding: 0;
 }
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  box-sizing: border-box;
+}
+*, *::before, *::after {
+  box-sizing: inherit;
 }
 
 body {
+  font-family: 'Roboto', sans-serif;
   background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color: var(--text-dark);
+  max-width: 1920px;
+  margin: 0 auto;
+  min-height: 100vh;
+}
+
+/* Хедър и навигация */
+header {
+  /* sticky позициониране е премахнато; позиционираме хедъра като блок с пълна ширина */
+  background-color: var(--primary);
+  color: var(--text-light);
+  width: 100%;
+}
+
+/* Вътрешен контейнер за хедъра – ограничава ширината и центрира съдържанието */
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0.5em 1.5em;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* Контейнер за навигацията */
+.nav-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* Секция само за навигационните връзки – те се центрират */
+.nav-items {
+  display: flex;
+  align-items: center;
+  gap: 2em;
+  flex: 1;
+  justify-content: center;
+}
+
+/* Секция за търсене в навигацията */
+.search-form {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+  /* търсачката ще се позиционира вдясно чрез flex разделяне */
+}
+
+.search-input {
+  padding: 0.4em 0.8em;
+  border: 1px solid var(--primary);
+  border-radius: 0.4em;
+  font-size: 1rem;
+  color: var(--primary);
+  background-color: #fff;
+}
+
+.search-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.search-btn {
+  padding: 0.4em 0.8em;
+  border: 1px solid var(--primary);
+  border-radius: 0.4em;
+  font-size: 1rem;
+  color: var(--primary);
+  background-color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.search-btn:hover {
+  background-color: var(--accent-light);
+  border-color: var(--accent);
+  color: var(--text-light);
+}
+
+.nav-link {
+  display: block;
+  padding: 0.75rem 0.5rem;
+  color: var(--text-light);
+  font-size: 1.2em;
+  font-weight: 400;
+  border-bottom: 2px solid transparent;
+  transition: color 0.2s, border-bottom-color 0.2s;
+}
+.nav-link:hover,
+.nav-link.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+  font-weight: 600;
+}
+
+/* Администраторски връзки – по-светъл нюанс на зелено */
+.nav-admin {
+  color: var(--secondary);
+}
+.nav-admin:hover {
+  color: var(--accent);
+}
+
+/* Типография */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 400;
+  margin-bottom: 0.5em;
+  color: var(--primary);
+}
+h1 { font-size: 3em; }
+h2 { font-size: 2.5em; }
+h3 { font-size: 2em; }
+h4 { font-size: 1.75em; }
+h5 { font-size: 1.5em; }
+h6 { font-size: 1.25em; }
+
+ul, ol {
+  padding-left: 1.5em;
+  padding-bottom: 1.5em;
+  list-style: none;
+  color: var(--primary);
+}
+a {
+  text-decoration: none;
+  color: var(--primary);
+}
+a:hover {
+  color: var(--accent);
+}
+
+/* Основна структура */
+main {
+  margin: 1.5em auto;
+}
+
+footer {
+  background-color: var(--primary-light);
+  color: var(--text-light);
+  padding: 2em 3em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 5em;
+  width: 100%;
+}
+footer p {
+  font-size: 1.2rem;
+  margin: 0;
+  padding: 0;
+}
+
+/* Бутони */
+button {
+  background-color: var(--accent);
+  color: var(--text-light);
+  padding: 0.5em 1.5em;
+  border-radius: 5px;
+  font-size: 1rem;
+  font-weight: bold;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s, box-shadow 0.2s;
+}
+button:hover {
+  background-color: var(--accent-light);
+  color: var(--primary);
+  box-shadow: 0 0 0.3em var(--accent);
+}
+
+/* Формови елементи */
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+/* Изображения и медия */
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+/* Медийна заявка за малки екрани */
+@media (max-width: 768px) {
+  header {
+    padding: 0.5em 1em;
+    display: flex;
+    justify-content: center;
+  }
+  .nav-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  .nav-items {
+    flex-wrap: wrap;
+    gap: 1rem;
+    justify-content: center;
+  }
+  .search-form {
+    justify-content: center;
+  }
 }

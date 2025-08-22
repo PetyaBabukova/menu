@@ -1,45 +1,53 @@
 import mongoose from 'mongoose';
 import bcrypt from 'bcrypt';
-import validator from 'validator';
 
-const restaurantSchema = new mongoose.Schema({
-  restaurantName: {
-    type: String,
-    required: [true, 'Името на ресторанта е задължително!'],
-    trim: true,
-    unique: true,
-    minLength: [2, 'Минимум 2 символа'],
-  },
-  ownerName: {
-    type: String,
-    required: [true, 'Името на собственика е задължително!'],
-    trim: true,
-    minLength: [2, 'Минимум 2 символа'],
-  },
-  email: {
-    type: String,
-    required: [true, 'Email е задължителен!'],
-    trim: true,
-    lowercase: true,
-    unique: true,
-    validate: {
-      validator: validator.isEmail,
-      message: 'Невалиден email адрес!',
+/**
+ * Модел за ресторант.
+ * Съдържа уникално име (restaurantName), име на собственик, email и парола.
+ * restaurantName и email се нормализират до lower case за лесно търсене.
+ */
+const restaurantSchema = new mongoose.Schema(
+  {
+    restaurantName: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+    },
+    ownerName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+    },
+    password: {
+      type: String,
+      required: true,
     },
   },
-  password: {
-    type: String,
-    required: [true, 'Паролата е задължителна!'],
-    minLength: [6, 'Минимум 6 символа'],
-  }
-}, { timestamps: true });
+  {
+    timestamps: true,
+  },
+);
 
+// Pre-save hook за хеширане на паролата
 restaurantSchema.pre('save', async function (next) {
-  if (this.isModified('password')) {
-    this.password = await bcrypt.hash(this.password, 10);
+  const restaurant = this;
+  if (!restaurant.isModified('password')) return next();
+  try {
+    const salt = await bcrypt.genSalt(10);
+    restaurant.password = await bcrypt.hash(restaurant.password, salt);
+    return next();
+  } catch (err) {
+    return next(err);
   }
-  next();
 });
 
-const Restaurant = mongoose.model('Restaurant', restaurantSchema, 'restaurants');
-export default Restaurant;
+export default mongoose.model('Restaurant', restaurantSchema);

@@ -5,6 +5,17 @@ import jwt from 'jsonwebtoken';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'secret';
 
+/**
+ * Връща ресторант по име. Използва се за проверка дали ресторантът е регистриран.
+ * @param {string} restaurantName - Името на ресторанта от URL
+ * @returns {Promise<Object|null>} - Документът на ресторанта или null, ако не съществува
+ */
+export async function getRestaurantByName(restaurantName) {
+  // Нормализираме входа, за да избягваме несъответствия
+  const normalizedName = restaurantName.toLowerCase().trim();
+  return await Restaurant.findOne({ restaurantName: normalizedName });
+}
+
 // Login restaurant
 export async function loginRestaurant(email, password, restaurantNameFromUrl) {
   // Търсим по име + email, за да избегнем несъответствия
@@ -14,12 +25,14 @@ export async function loginRestaurant(email, password, restaurantNameFromUrl) {
   });
 
   if (!restaurant) {
-    throw new Error('Invalid credentials');
+    // Невалидни данни за вход – връщаме съобщение на български език
+    throw new Error('Невалидни входни данни');
   }
 
   const isValid = await bcrypt.compare(password, restaurant.password);
   if (!isValid) {
-    throw new Error('Invalid credentials');
+    // Невалидни данни за вход – връщаме съобщение на български език
+    throw new Error('Невалидни входни данни');
   }
 
   const token = jwt.sign(
@@ -86,10 +99,4 @@ export async function registerRestaurant({ restaurantName, ownerName, email, pas
     restaurantName: restaurant.restaurantName,
     email: restaurant.email
   };
-}
-
-// Нова функция за извличане на ресторант по име
-export async function getRestaurantByName(restaurantName) {
-  const normalizedName = restaurantName.toLowerCase().trim();
-  return await Restaurant.findOne({ restaurantName: normalizedName });
 }
